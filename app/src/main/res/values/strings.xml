@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MapMyRun</string>
     <string name="title_activity_maps">Map</string>
+    <string name="action_style">Style</string>
+    <string name="action_info">Info</string>
+    <string name="action_help">Help</string>
 </resources>
