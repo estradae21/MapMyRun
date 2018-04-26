@@ -1,11 +1,17 @@
 package com.ernestoestrada.mapmyrun
 
 import android.Manifest.*
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.location.LocationProvider
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 
@@ -16,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.selector
 import org.jetbrains.anko.toast
 import java.util.jar.Manifest
@@ -23,18 +30,24 @@ import java.util.jar.Manifest
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val LOCATION_REQUEST_CODE = 101
+    private var mLocationPermissionGranted = false
     private lateinit var mMap: GoogleMap
+    private var locationManager:LocationManager? = null
+    private var longitude: Double? = null
+    private var latitude: Double? = null
+    private var latLng: LatLng? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
+
         var actionBar = getSupportActionBar()
         actionBar!!.setDisplayShowTitleEnabled(false)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -52,6 +65,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 } else {
                     val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
                     mapFragment.getMapAsync(this)
+                    mLocationPermissionGranted = true
                 }
             }
         }
@@ -59,14 +73,46 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        if (mMap != null) {
-            val isOkay = ContextCompat.checkSelfPermission(this,
-                    permission.ACCESS_FINE_LOCATION)
+        if (true) {
+            val isOkay = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
             if (isOkay == PackageManager.PERMISSION_GRANTED) {
-                mMap.isMyLocationEnabled = true
+                mMap?.isMyLocationEnabled = true
+                getGPS()
+                //val lastknown = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                //val lat = lastknown
+                //toast("$lastknown")
+                //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+                //val latLng = LatLng(latitude!!, longitude!!)
+                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+
             } else {
                 requestPermission(permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE)
+            }
+        }
+    }
+
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            longitude = location.longitude
+            latitude = location.latitude
+            //val latLng = LatLng(latitude!!, longitude!!)
+            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+            toast("$longitude $latitude")
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
+    }
+
+    private fun getGPS() {
+        val isOkay = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
+        if (isOkay == PackageManager.PERMISSION_GRANTED) {
+            val lastknown = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (lastknown != null) {
+                longitude = lastknown.longitude
+                latitude = lastknown.latitude
+                latLng = LatLng(latitude!!, longitude!!)
             }
         }
     }
@@ -100,6 +146,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 }
 
+
+
 /*
 http://www.techotopia.com/index.php/Kotlin_-_Working_with_the_Google_Maps_Android_API_in_Android_Studio
      GoogleMap.MAP_TYPE_NONE﻿ – An empty grid with no mapping tiles displayed.
@@ -108,4 +156,8 @@ http://www.techotopia.com/index.php/Kotlin_-_Working_with_the_Google_Maps_Androi
      GoogleMap.MAP_TYPE_HYBRID﻿ – Displays satellite imagery with the road maps superimposed.
      GoogleMap.MAP_TYPE_TERRAIN – Displays topographical information such as contour lines and colors.
      mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+
+
+     android programming the big nerd ranch guide 3rd
+     chapter 34
  */
