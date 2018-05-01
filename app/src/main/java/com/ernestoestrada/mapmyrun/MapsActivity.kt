@@ -81,7 +81,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 //val lastknown = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 //val lat = lastknown
                 //toast("$lastknown")
-                //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+
                 //val latLng = LatLng(latitude!!, longitude!!)
                 //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
@@ -92,6 +92,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    
+    //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             longitude = location.longitude
