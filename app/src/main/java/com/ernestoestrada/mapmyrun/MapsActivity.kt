@@ -9,18 +9,21 @@ import android.location.LocationManager
 import android.location.LocationProvider
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-
+import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_maps.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.selector
@@ -37,10 +40,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var latitude: Double? = null
     private var latLng: LatLng? = null
 
+    var handler: Handler? = null
+    internal var MillisecondTime: Long = 0
+    internal var StartTime: Long = 0
+    internal var TimeBuff: Long = 0
+    internal var UpdateTime = 0L
+    internal var Seconds: Int = 0
+    internal var Minutes: Int = 0
+    internal var MilliSeconds: Int = 0
+    internal var flag:Boolean=false
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-
+        bindViews()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 
         var actionBar = getSupportActionBar()
@@ -49,7 +63,58 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
     }
+
+    private fun bindViews() {
+
+        startbtn.setOnClickListener {
+            if (flag) {
+                handler?.removeCallbacks(runnable)
+                startbtn?.setImageResource(R.drawable.ic_play)
+            } else {
+                startbtn?.setImageResource(R.drawable.ic_pause)
+                StartTime = SystemClock.uptimeMillis()
+                handler?.postDelayed(runnable, 0)
+                flag = true
+            }
+        }
+        handler = Handler()
+    }
+
+    var runnable : Runnable = object : Runnable {
+        override fun run() {
+            var seconds = ""
+            var minutes = ""
+            var hours = ""
+
+            MillisecondTime = SystemClock.uptimeMillis() - StartTime
+            UpdateTime = TimeBuff + MillisecondTime
+            Seconds = (UpdateTime / 1000).toInt()
+            Minutes = Seconds / 60
+            Seconds = Seconds % 60
+            MilliSeconds = (UpdateTime % 1000).toInt()
+
+            if (Minutes.toString().length < 2) {
+                minutes = "0" + Minutes.toString()
+            } else {
+                minutes = Minutes.toString()
+            }
+            if (Seconds.toString().length < 2) {
+                seconds = "0" + Seconds.toString()
+            } else {
+                seconds = Seconds.toString()
+            }
+
+            tView?.text = "$hours:$minutes:$seconds"
+            //milli_seconds?.text = MilliSeconds.toString()
+
+            handler?.postDelayed(this, 0)
+        }
+
+    }
+
 
     private fun requestPermission(PermissionType: String, requestCode: Int) {
         ActivityCompat.requestPermissions(this, arrayOf(PermissionType), requestCode)
@@ -92,7 +157,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    
+
     //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
     private val locationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
@@ -162,4 +227,8 @@ http://www.techotopia.com/index.php/Kotlin_-_Working_with_the_Google_Maps_Androi
 
      android programming the big nerd ranch guide 3rd
      chapter 34
+
+
+     @android:drawable/ic_media_pause
+     @android:drawable/ic_media_play
  */
