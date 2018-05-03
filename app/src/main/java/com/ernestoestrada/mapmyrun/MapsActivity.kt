@@ -45,7 +45,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var handler: Handler? = null
     internal var MillisecondTime: Long = 0
     internal var StartTime: Long = 0
-    internal var PauseTime: Long = 0
     internal var TimeBuff: Long = 0
     internal var UpdateTime = 0L
     internal var Seconds: Int = 0
@@ -69,14 +68,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         startbtn.setOnClickListener {
             if (isPaused == true) {
-                toast("$StartTime")
-                MillisecondTime = MillisecondTime - PauseTime
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
                 isPaused = false
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
             } else {
-                toast("$StartTime")
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
@@ -85,19 +81,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         handler = Handler()
 
-
         pausebtn.setOnClickListener {
             if (TimerOn == true) {
-                isPaused = true
-                TimerOn = false
+                TimeBuff += MillisecondTime
+                handler?.removeCallbacks(runnable)
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
             }
         }
+
         stopbtn.setOnClickListener {
             mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
         }
-
-
     }
 
     var runnable : Runnable = object : Runnable {
@@ -113,19 +107,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Seconds = Seconds % 60
             MilliSeconds = (UpdateTime % 1000).toInt()
 
-            if (Minutes == 60) {
-                hours += 1
-            }
-            if (Minutes.toString().length < 2) {
-                minutes = "0" + Minutes.toString()
-            } else {
-                minutes = Minutes.toString()
-            }
-            if (Seconds.toString().length < 2) {
-                seconds = "0" + Seconds.toString()
-            } else {
-                seconds = Seconds.toString()
-            }
+            if (Minutes == 60) { hours += 1 }
+            if (Minutes.toString().length < 2) { minutes = "0" + Minutes.toString() }
+            else { minutes = Minutes.toString() }
+            if (Seconds.toString().length < 2) { seconds = "0" + Seconds.toString() }
+            else { seconds = Seconds.toString() }
+            
             tView?.text = "$hours:$minutes:$seconds"
             handler?.postDelayed(this, 0)
         }
