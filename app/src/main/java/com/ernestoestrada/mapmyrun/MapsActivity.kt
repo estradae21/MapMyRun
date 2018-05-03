@@ -41,8 +41,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var longitude: Double? = null
     private var latitude: Double? = null
     private var latLng: LatLng? = null
-
+    private var points = ArrayList<LatLng>()
     var handler: Handler? = null
+    internal var seconds = ""
+    internal var minutes = ""
+    internal var hours = "00"
     internal var MillisecondTime: Long = 0
     internal var StartTime: Long = 0
     internal var TimeBuff: Long = 0
@@ -52,6 +55,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     internal var MilliSeconds: Int = 0
     internal var TimerOn:Boolean = false
     internal var isPaused:Boolean = false
+    internal var TotalTime = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,11 +72,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         startbtn.setOnClickListener {
             if (isPaused == true) {
+                StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
                 isPaused = false
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
-            } else {
+            }
+
+            else {
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
@@ -86,20 +93,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 TimeBuff += MillisecondTime
                 handler?.removeCallbacks(runnable)
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
+                isPaused = true
+                TimerOn = false
             }
         }
 
         stopbtn.setOnClickListener {
+            TotalTime = "$hours:$minutes:$seconds"
+            MillisecondTime = 0L
+            StartTime = 0L
+            TimeBuff = 0L
+            UpdateTime = 0L
+            Seconds = 0
+            Minutes = 0
+            MilliSeconds = 0
             mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
+            runfinished()
         }
     }
 
     var runnable : Runnable = object : Runnable {
         override fun run() {
-            var seconds = ""
-            var minutes = ""
-            var hours = "00"
-
             MillisecondTime = SystemClock.uptimeMillis() - StartTime
             UpdateTime = TimeBuff + MillisecondTime
             Seconds = (UpdateTime / 1000).toInt()
@@ -112,7 +126,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             else { minutes = Minutes.toString() }
             if (Seconds.toString().length < 2) { seconds = "0" + Seconds.toString() }
             else { seconds = Seconds.toString() }
-            
+
             tView?.text = "$hours:$minutes:$seconds"
             handler?.postDelayed(this, 0)
         }
@@ -161,21 +175,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-    //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
-    private val locationListener: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            longitude = location.longitude
-            latitude = location.latitude
-            //val latLng = LatLng(latitude!!, longitude!!)
-            //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
-            toast("$longitude $latitude")
-        }
-        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
-        override fun onProviderEnabled(provider: String) {}
-        override fun onProviderDisabled(provider: String) {}
-    }
-
     private fun getGPS() {
         val isOkay = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
         if (isOkay == PackageManager.PERMISSION_GRANTED) {
@@ -187,6 +186,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
+    //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            longitude = location.longitude
+            latitude = location.latitude
+            latLng = LatLng(latitude!!,longitude!!)
+            points.add(latLng!!)
+            redrawline()
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
+    }
+
+    private fun redrawline() { }
+
+    private fun runfinished() { }
 
     private fun mapstyle () {
         val mapList = arrayListOf<String>("Normal", "Satelleite", "Terrain", "Hybrid")
@@ -220,19 +237,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
 /*
-http://www.techotopia.com/index.php/Kotlin_-_Working_with_the_Google_Maps_Android_API_in_Android_Studio
-     GoogleMap.MAP_TYPE_NONE﻿ – An empty grid with no mapping tiles displayed.
-     GoogleMap.MAP_TYPE_NORMAL﻿ – The standard view consisting of the classic road map.
-     GoogleMap.MAP_TYPE_SATELLITE﻿ – Displays the satellite imagery of the map region.
-     GoogleMap.MAP_TYPE_HYBRID﻿ – Displays satellite imagery with the road maps superimposed.
-     GoogleMap.MAP_TYPE_TERRAIN – Displays topographical information such as contour lines and colors.
-     mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
-
-
-     android programming the big nerd ranch guide 3rd
-     chapter 34
-
-
-     @android:drawable/ic_media_pause
-     @android:drawable/ic_media_play
+    https://stackoverflow.com/questions/30249920/how-to-draw-path-as-i-move-starting-from-my-current-location-using-google-maps
+    http://www.techotopia.com/index.php/Kotlin_-_Working_with_the_Google_Maps_Android_API_in_Android_Studio
+    GoogleMap.MAP_TYPE_NONE﻿ – An empty grid with no mapping tiles displayed.
+    GoogleMap.MAP_TYPE_NORMAL﻿ – The standard view consisting of the classic road map.
+    GoogleMap.MAP_TYPE_SATELLITE﻿ – Displays the satellite imagery of the map region.
+    GoogleMap.MAP_TYPE_HYBRID﻿ – Displays satellite imagery with the road maps superimposed.
+    GoogleMap.MAP_TYPE_TERRAIN – Displays topographical information such as contour lines and colors.
+    mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+    android programming the big nerd ranch guide 3rd
+    chapter 34
+    @android:drawable/ic_media_pause
+    @android:drawable/ic_media_play
  */
