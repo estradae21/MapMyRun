@@ -17,6 +17,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import com.ernestoestrada.mapmyrun.R.id.startbtn
+import com.ernestoestrada.mapmyrun.R.id.tView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -43,18 +45,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var handler: Handler? = null
     internal var MillisecondTime: Long = 0
     internal var StartTime: Long = 0
+    internal var PauseTime: Long = 0
     internal var TimeBuff: Long = 0
     internal var UpdateTime = 0L
     internal var Seconds: Int = 0
     internal var Minutes: Int = 0
     internal var MilliSeconds: Int = 0
-    internal var flag:Boolean=false
-
+    internal var TimerOn:Boolean = false
+    internal var isPaused:Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        bindViews()
+        //bindViews()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 
         var actionBar = getSupportActionBar()
@@ -64,30 +67,44 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
-    }
-
-    private fun bindViews() {
-
         startbtn.setOnClickListener {
-            if (flag) {
-                handler?.removeCallbacks(runnable)
-                startbtn?.setImageResource(R.drawable.ic_play)
+            if (isPaused == true) {
+                toast("$StartTime")
+                MillisecondTime = MillisecondTime - PauseTime
+                handler?.postDelayed(runnable, 0)
+                TimerOn = true
+                isPaused = false
+                mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
             } else {
-                startbtn?.setImageResource(R.drawable.ic_pause)
+                toast("$StartTime")
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
-                flag = true
+                TimerOn = true
+                mMap.addMarker(MarkerOptions().position(latLng!!).title("Start"))
             }
         }
         handler = Handler()
+
+
+        pausebtn.setOnClickListener {
+            if (TimerOn == true) {
+                isPaused = true
+                TimerOn = false
+                mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
+            }
+        }
+        stopbtn.setOnClickListener {
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
+        }
+
+
     }
 
     var runnable : Runnable = object : Runnable {
         override fun run() {
             var seconds = ""
             var minutes = ""
-            var hours = ""
+            var hours = "00"
 
             MillisecondTime = SystemClock.uptimeMillis() - StartTime
             UpdateTime = TimeBuff + MillisecondTime
@@ -96,6 +113,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Seconds = Seconds % 60
             MilliSeconds = (UpdateTime % 1000).toInt()
 
+            if (Minutes == 60) {
+                hours += 1
+            }
             if (Minutes.toString().length < 2) {
                 minutes = "0" + Minutes.toString()
             } else {
@@ -106,10 +126,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 seconds = Seconds.toString()
             }
-
             tView?.text = "$hours:$minutes:$seconds"
-            //milli_seconds?.text = MilliSeconds.toString()
-
             handler?.postDelayed(this, 0)
         }
 

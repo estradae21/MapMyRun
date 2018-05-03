@@ -48,21 +48,56 @@
         app:layout_constraintVertical_bias="0.102" />
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/pausebtn"
+        android:layout_width="111dp"
+        android:layout_height="84dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/stopbtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/startbtn"
+        app:layout_constraintTop_toBottomOf="@+id/map"
+        app:layout_constraintVertical_bias="0.972"
+        app:srcCompat="@drawable/ic_pause" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/startbtn"
         android:layout_width="111dp"
         android:layout_height="84dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        app:backgroundTint="@android:color/holo_blue_dark"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/pausebtn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map"
+        app:layout_constraintVertical_bias="0.972"
+        app:srcCompat="@drawable/ic_play" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/stopbtn"
+        android:layout_width="111dp"
+        android:layout_height="84dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
         app:backgroundTint="@android:color/holo_blue_dark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/pausebtn"
         app:layout_constraintTop_toBottomOf="@+id/map"
-        app:layout_constraintVertical_bias="0.927"
-        app:srcCompat="@drawable/ic_play" />
+        app:layout_constraintVertical_bias="0.972"
+        app:srcCompat="@drawable/ic_stop" />
 
 
 </android.support.constraint.ConstraintLayout>
