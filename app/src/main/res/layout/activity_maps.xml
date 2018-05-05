@@ -10,6 +10,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="300dp"
+        app:layout_constraintDimensionRatio="w,1:1"
         tools:context=".MapsActivity" />
 
     <TextView
@@ -22,7 +23,9 @@
         android:fontFamily="@font/roboto"
         android:text="0.0 miles"
         android:textAlignment="center"
+        android:textColor="@color/black"
         android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
@@ -39,7 +42,9 @@
         android:fontFamily="@font/roboto"
         android:text="00:00:00"
         android:textAlignment="center"
+        android:textColor="@color/black"
         android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/mView"
         app:layout_constraintHorizontal_bias="0.077"
@@ -54,50 +59,52 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
-        app:backgroundTint="@android:color/holo_blue_dark"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/stopbtn"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/startbtn"
-        app:layout_constraintTop_toBottomOf="@+id/map"
-        app:layout_constraintVertical_bias="0.972"
-        app:srcCompat="@drawable/ic_pause" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/startbtn"
-        android:layout_width="111dp"
-        android:layout_height="84dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:clickable="true"
-        app:backgroundTint="@android:color/holo_blue_dark"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/pausebtn"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
-        app:layout_constraintVertical_bias="0.972"
-        app:srcCompat="@drawable/ic_play" />
+        app:layout_constraintVertical_bias="0.843"
+        app:srcCompat="@drawable/ic_pause" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/stopbtn"
         android:layout_width="111dp"
         android:layout_height="84dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:clickable="true"
-        app:backgroundTint="@android:color/holo_blue_dark"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/pausebtn"
         app:layout_constraintTop_toBottomOf="@+id/map"
-        app:layout_constraintVertical_bias="0.972"
+        app:layout_constraintVertical_bias="0.843"
         app:srcCompat="@drawable/ic_stop" />
+
+    <Button
+        android:id="@+id/startbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/round_button"
+        android:fontFamily="@font/roboto"
+        android:text="Start"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map"
+        app:layout_constraintVertical_bias="0.805" />
 
 
 </android.support.constraint.ConstraintLayout>

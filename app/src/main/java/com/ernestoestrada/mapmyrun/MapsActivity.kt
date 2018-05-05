@@ -3,6 +3,7 @@ package com.ernestoestrada.mapmyrun
 import android.Manifest.*
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -16,9 +17,11 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
-import com.ernestoestrada.mapmyrun.R.id.startbtn
-import com.ernestoestrada.mapmyrun.R.id.tView
+import com.ernestoestrada.mapmyrun.R.id.*
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -30,32 +33,34 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.selector
 import org.jetbrains.anko.toast
+import java.util.*
 import java.util.jar.Manifest
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val LOCATION_REQUEST_CODE = 101
     private var mLocationPermissionGranted = false
-    private lateinit var mMap: GoogleMap
-    private var locationManager:LocationManager? = null
-    private var longitude: Double? = null
-    private var latitude: Double? = null
-    private var latLng: LatLng? = null
+    private lateinit var mMap : GoogleMap
+    private var locationManager :LocationManager? = null
+    private var longitude : Double? = null
+    private var latitude : Double? = null
+    private var latLng : LatLng? = null
     private var points = ArrayList<LatLng>()
     var handler: Handler? = null
     internal var seconds = ""
     internal var minutes = ""
     internal var hours = "00"
-    internal var MillisecondTime: Long = 0
-    internal var StartTime: Long = 0
-    internal var TimeBuff: Long = 0
+    internal var MillisecondTime : Long = 0
+    internal var StartTime : Long = 0
+    internal var TimeBuff : Long = 0
     internal var UpdateTime = 0L
-    internal var Seconds: Int = 0
-    internal var Minutes: Int = 0
-    internal var MilliSeconds: Int = 0
-    internal var TimerOn:Boolean = false
-    internal var isPaused:Boolean = false
+    internal var Seconds : Int = 0
+    internal var Minutes : Int = 0
+    internal var MilliSeconds : Int = 0
+    internal var TimerOn :Boolean = false
+    internal var isPaused :Boolean = false
     internal var TotalTime = ""
+    lateinit var line : Polyline
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,10 +70,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var actionBar = getSupportActionBar()
         actionBar!!.setDisplayShowTitleEnabled(false)
+        actionBar!!.setDisplayShowTitleEnabled(true)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        //points = ArrayList<LatLng>()
+        //locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener)
 
         startbtn.setOnClickListener {
             if (isPaused == true) {
@@ -77,13 +86,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 TimerOn = true
                 isPaused = false
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
+                buttons(0)
             }
 
             else {
+                try {
+                    // Request location updates
+                    locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
+                } catch(ex: SecurityException) {
+                    Log.d("myTag", "Security Exception, no location available");
+                }
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Start"))
+                buttons(0)
             }
         }
         handler = Handler()
@@ -95,10 +112,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
                 isPaused = true
                 TimerOn = false
+                buttons(1)
             }
         }
 
         stopbtn.setOnClickListener {
+            buttons(1)
             TotalTime = "$hours:$minutes:$seconds"
             MillisecondTime = 0L
             StartTime = 0L
@@ -108,6 +127,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Minutes = 0
             MilliSeconds = 0
             mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
+            handler?.removeCallbacks(runnable)
+            tView.setText("00:00:00")
             runfinished()
         }
     }
@@ -133,6 +154,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
+    private fun buttons(idx : Int) {
+        if (idx == 0) {
+            startbtn.visibility = View.INVISIBLE
+            pausebtn.visibility = View.VISIBLE
+            stopbtn.visibility = View.VISIBLE
+        }
+        if (idx == 1) {
+            startbtn.visibility = View.VISIBLE
+            pausebtn.visibility = View.INVISIBLE
+            stopbtn.visibility = View.INVISIBLE
+        }
+    }
 
     private fun requestPermission(PermissionType: String, requestCode: Int) {
         ActivityCompat.requestPermissions(this, arrayOf(PermissionType), requestCode)
@@ -201,7 +234,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun onProviderDisabled(provider: String) {}
     }
 
-    private fun redrawline() { }
+    private fun redrawline() {
+        val options : PolylineOptions = PolylineOptions().width(8f).color(Color.GREEN).geodesic(true)
+        for (i in 0 until points.size) {
+            val point = points[i]
+            options.add(point)
+        }
+
+        //val options = PolylineOptions().width(5f).color(Color.BLUE).geodesic(true)
+        for (i in 0 until points.size) {
+            val point = points[i]
+            options.add(point)
+        }
+        line  = mMap.addPolyline(options)
+    }
 
     private fun runfinished() { }
 
