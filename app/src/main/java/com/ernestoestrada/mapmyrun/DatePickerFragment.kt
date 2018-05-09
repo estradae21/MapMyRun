@@ -38,7 +38,7 @@ class DatePickerFragment : DialogFragment()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog
     {
-        var date : Date = arguments.getSerializable(ARG_DATE) as Date
+        var date : Date = arguments?.getSerializable(ARG_DATE) as Date
 
         var calendar : Calendar = Calendar.getInstance()
         calendar.time = date
@@ -53,7 +53,7 @@ class DatePickerFragment : DialogFragment()
         mDatePicker = v.findViewById(R.id.dialog_date_picker)
         mDatePicker.init(year, month, day, null)
 
-        return AlertDialog.Builder(activity).setView(v).setTitle(R.string.date_picker_title).
+        return AlertDialog.Builder(activity!!).setView(v).setTitle(R.string.date_picker_title).
                 setPositiveButton(android.R.string.ok, object : DialogInterface.OnClickListener{
                     override fun onClick(dialog: DialogInterface?, which: Int)
                     {
@@ -78,6 +78,6 @@ class DatePickerFragment : DialogFragment()
         var intent : Intent = Intent()
         intent.putExtra(EXTRA_DATE, date)
 
-        targetFragment.onActivityResult(targetRequestCode, resultCode, intent)
+        targetFragment!!.onActivityResult(targetRequestCode, resultCode, intent)
     }
 }
