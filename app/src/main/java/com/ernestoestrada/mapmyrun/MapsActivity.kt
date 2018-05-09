@@ -116,6 +116,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         stopbtn.setOnClickListener {
+            locationManager?.removeUpdates(locationListener)
             buttons(1)
             TotalTime = "$hours:$minutes:$seconds"
             MillisecondTime = 0L
@@ -155,16 +156,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addMarker(idx : Int) {
         if (idx == 0) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Start").icon(BitmapDescriptorFactory.defaultMarker(HUE_GREEN)))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Start")
+                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_GREEN)))
         }
         if (idx == 1) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume").icon(BitmapDescriptorFactory.defaultMarker(HUE_BLUE)))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume")
+                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_BLUE)))
         }
         if (idx == 2) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause").icon(BitmapDescriptorFactory.defaultMarker(HUE_YELLOW)))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause")
+                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_YELLOW)))
         }
         if (idx ==3) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish").icon(BitmapDescriptorFactory.defaultMarker(HUE_ROSE)))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish")
+                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_ROSE)))
 }
 }
 
@@ -251,15 +256,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var distance : Float = 0F
         distance = oldLocation!!.distanceTo(newLocation)
         if (distance >= 20.0) {
-            toast("$distance")
             distanceTraveled += distance
-            //mView.text =
             oldLocation = newLocation
         }
         else {
-            toast("good")
             Log.i("Distance", "Distance is to close to measure ")
         }
+        mView.text = "${"%.2f".format(distanceTraveled * 0.000621371192237334)} miles"
         /* newLocation = location
         distanceTraveled += oldLocation!!.distanceTo(newLocation)
         distanceTraveled *= 0.000621371192237334
@@ -309,7 +312,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    
 }
 
 
