@@ -85,21 +85,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
                 isPaused = false
-                mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
+                addMarker(1)
                 buttons(0)
             }
 
             else {
                 try {
                     // Request location updates
-                    locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
+                    locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
                 } catch(ex: SecurityException) {
                     Log.d("myTag", "Security Exception, no location available");
                 }
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
-                mMap.addMarker(MarkerOptions().position(latLng!!).title("Start"))
+                addMarker(0)
                 buttons(0)
             }
         }
@@ -109,7 +109,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (TimerOn == true) {
                 TimeBuff += MillisecondTime
                 handler?.removeCallbacks(runnable)
-                mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
+                addMarker(2)
                 isPaused = true
                 TimerOn = false
                 buttons(1)
@@ -126,7 +126,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Seconds = 0
             Minutes = 0
             MilliSeconds = 0
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
+            addMarker(3)
             handler?.removeCallbacks(runnable)
             tView.setText("00:00:00")
             runfinished()
@@ -152,6 +152,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             handler?.postDelayed(this, 0)
         }
 
+    }
+
+    private fun addMarker(idx : Int) {
+        if (idx == 0) {
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Start"))
+        }
+        if (idx == 1) {
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
+        }
+        if (idx == 2) {
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
+        }
+        if (idx ==3) {
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
+        }
     }
 
     private fun buttons(idx : Int) {
@@ -194,12 +209,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (isOkay == PackageManager.PERMISSION_GRANTED) {
                 mMap?.isMyLocationEnabled = true
                 getGPS()
-                //val lastknown = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                //val lat = lastknown
-                //toast("$lastknown")
-
-                //val latLng = LatLng(latitude!!, longitude!!)
-                //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
 
             } else {
@@ -216,6 +225,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 longitude = lastknown.longitude
                 latitude = lastknown.latitude
                 latLng = LatLng(latitude!!, longitude!!)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
             }
         }
     }
@@ -236,12 +246,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun redrawline() {
         val options : PolylineOptions = PolylineOptions().width(8f).color(Color.GREEN).geodesic(true)
-        for (i in 0 until points.size) {
-            val point = points[i]
-            options.add(point)
-        }
-
-        //val options = PolylineOptions().width(5f).color(Color.BLUE).geodesic(true)
         for (i in 0 until points.size) {
             val point = points[i]
             options.add(point)
