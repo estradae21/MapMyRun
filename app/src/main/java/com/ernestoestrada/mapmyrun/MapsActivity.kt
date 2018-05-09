@@ -1,13 +1,11 @@
 package com.ernestoestrada.mapmyrun
 
 import android.Manifest.*
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.location.LocationProvider
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -18,23 +16,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
-import com.ernestoestrada.mapmyrun.R.id.*
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory.*
 import kotlinx.android.synthetic.main.activity_maps.*
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.selector
 import org.jetbrains.anko.toast
 import java.util.*
-import java.util.jar.Manifest
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -46,6 +37,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var latitude : Double? = null
     private var latLng : LatLng? = null
     private var points = ArrayList<LatLng>()
+    private var newLocation : Location? = null
+    private var oldLocation : Location? = null
+    private var distanceTraveled : Double = 0.0
     var handler: Handler? = null
     internal var seconds = ""
     internal var minutes = ""
@@ -61,6 +55,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     internal var isPaused :Boolean = false
     internal var TotalTime = ""
     lateinit var line : Polyline
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,9 +88,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 try {
                     // Request location updates
                     locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
+                    newLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    oldLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 } catch(ex: SecurityException) {
                     Log.d("myTag", "Security Exception, no location available");
                 }
+                getGPS()
                 StartTime = SystemClock.uptimeMillis()
                 handler?.postDelayed(runnable, 0)
                 TimerOn = true
@@ -156,18 +154,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addMarker(idx : Int) {
         if (idx == 0) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Start"))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Start").icon(BitmapDescriptorFactory.defaultMarker(HUE_GREEN)))
         }
         if (idx == 1) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume"))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Resume").icon(BitmapDescriptorFactory.defaultMarker(HUE_BLUE)))
         }
         if (idx == 2) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause"))
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Pause").icon(BitmapDescriptorFactory.defaultMarker(HUE_YELLOW)))
         }
         if (idx ==3) {
-            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish"))
-        }
-    }
+            mMap.addMarker(MarkerOptions().position(latLng!!).title("Finish").icon(BitmapDescriptorFactory.defaultMarker(HUE_ROSE)))
+}
+}
 
     private fun buttons(idx : Int) {
         if (idx == 0) {
@@ -226,6 +224,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 latitude = lastknown.latitude
                 latLng = LatLng(latitude!!, longitude!!)
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+                //newLocation = lastknown
             }
         }
     }
@@ -237,15 +236,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             latitude = location.latitude
             latLng = LatLng(latitude!!,longitude!!)
             points.add(latLng!!)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
             redrawline()
+            getDistance(location)
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
     }
 
+    private fun getDistance(location: Location) {
+        newLocation = location
+        distanceTraveled += oldLocation!!.distanceTo(newLocation)
+        distanceTraveled *= 0.000621371192
+        mView.text = "$distanceTraveled miles"
+        oldLocation = location
+    }
+
     private fun redrawline() {
-        val options : PolylineOptions = PolylineOptions().width(8f).color(Color.GREEN).geodesic(true)
+        val options : PolylineOptions = PolylineOptions().width(8f).color(Color.CYAN).geodesic(true)
         for (i in 0 until points.size) {
             val point = points[i]
             options.add(point)
@@ -253,7 +262,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         line  = mMap.addPolyline(options)
     }
 
-    private fun runfinished() { }
+    private fun runfinished() {
+        //mMap.clear()
+    }
 
     private fun mapstyle () {
         val mapList = arrayListOf<String>("Normal", "Satelleite", "Terrain", "Hybrid")
