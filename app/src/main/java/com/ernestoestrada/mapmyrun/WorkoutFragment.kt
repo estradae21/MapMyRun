@@ -15,11 +15,12 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.content.FileProvider
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.text.format.DateFormat;
 import android.widget.*
+import com.ernestoestrada.mapmyrun.R
 import java.io.File
 import java.util.*
 
@@ -70,7 +71,7 @@ class WorkoutFragment : Fragment()
     {
         super.onCreate(savedInstanceState)
 
-        var workoutId : UUID = arguments.getSerializable(ARG_WORKOUT_ID) as UUID
+        var workoutId : UUID = arguments!!.getSerializable(ARG_WORKOUT_ID) as UUID
 
         mWorkout = WorkoutLab.get(activity)?.getWotkout(workoutId)!!
         mPhotoFile = WorkoutLab.get(activity)!!.getPhotoFile(mWorkout)
@@ -83,7 +84,7 @@ class WorkoutFragment : Fragment()
         WorkoutLab.get(activity)?.updateWorkout(mWorkout)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
         val v = inflater?.inflate(R.layout.fragment_workout, container, false)
 
@@ -112,7 +113,7 @@ class WorkoutFragment : Fragment()
         updateDate()
         mDateButton.setOnClickListener()
         {
-            var manager : FragmentManager = fragmentManager
+            var manager : FragmentManager = fragmentManager!!
 
             var dialog : DatePickerFragment = DatePickerFragment().newInstance(mWorkout.getDate()!!)
 
@@ -161,7 +162,7 @@ class WorkoutFragment : Fragment()
             mClientButton.setText(mWorkout.getClient())
         }
 
-        var packageManager : PackageManager = activity.packageManager
+        var packageManager : PackageManager = activity!!.packageManager
         if(packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null)
         {
             mClientButton.isEnabled = false
@@ -174,17 +175,17 @@ class WorkoutFragment : Fragment()
 
         mPhotoButton.setOnClickListener()
         {
-            var uri : Uri = FileProvider.getUriForFile(activity,
+            var uri : Uri = FileProvider.getUriForFile(activity!!,
                     "com.ernesto.neil.fitnessmapp.fileprovider", mPhotoFile)
 
             captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri)
 
             var cameraActivities : List<ResolveInfo> =
-                    activity.packageManager.queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
+                    activity!!.packageManager.queryIntentActivities(captureImage, PackageManager.MATCH_DEFAULT_ONLY)
 
             for(activity : ResolveInfo in cameraActivities)
             {
-                getActivity().grantUriPermission(activity.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                getActivity()?.grantUriPermission(activity.activityInfo.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             }
 
             startActivityForResult(captureImage, REQUEST_PHOTO)
@@ -207,7 +208,7 @@ class WorkoutFragment : Fragment()
         if(mPhotoFile != null && mPhotoFile.exists())
         {
             var photoFragment : PhotoFragment = PhotoFragment().newInstance(mWorkout.getId()!!)
-            var fragmentManager : FragmentManager = activity.supportFragmentManager
+            var fragmentManager : FragmentManager = activity!!.supportFragmentManager
             photoFragment.show(fragmentManager, sDialogPhoto)
         }
     }
@@ -234,7 +235,7 @@ class WorkoutFragment : Fragment()
             var queryFields : Array<String> = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
 
             //Perform your query - the contactUri is like a "where" clause here
-            var c : Cursor = activity.contentResolver.query(contactUri, queryFields,
+            var c : Cursor = activity!!.contentResolver.query(contactUri, queryFields,
                     null, null, null)
 
             try
@@ -258,10 +259,10 @@ class WorkoutFragment : Fragment()
         }
         else if(requestCode == REQUEST_PHOTO)
         {
-            var uri : Uri = FileProvider.getUriForFile(activity,
+            var uri : Uri = FileProvider.getUriForFile(activity!!,
                     "com.ernesto.neil.fitnessmapp.fileprovider", mPhotoFile)
 
-            activity.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            activity!!.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             updatePhotoView()
         }
     }
@@ -312,7 +313,7 @@ class WorkoutFragment : Fragment()
         }
         else
         {
-            var bitmap : Bitmap = PictureUtils().getScaledBitmap(mPhotoFile.path, activity)
+            var bitmap : Bitmap = PictureUtils().getScaledBitmap(mPhotoFile.path, activity!!)
             mPhotoView.setImageBitmap(bitmap)
         }
     }

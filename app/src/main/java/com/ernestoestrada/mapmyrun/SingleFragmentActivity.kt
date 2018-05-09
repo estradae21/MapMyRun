@@ -3,6 +3,7 @@ package com.ernesto.neil.fitnessmapp
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import com.ernestoestrada.mapmyrun.R
 
 /**
  * Created by neilk on 5/5/2018.

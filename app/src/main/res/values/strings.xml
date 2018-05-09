@@ -23,4 +23,5 @@
     <string name="workout_report_no_client">there is no client.</string>
     <string name="workout_report_client">the client is %s.</string>
     <string name="workout_report_subject">FitnessMapp Workout Report</string>
+    <string name="send_report">Send workout report via</string>
 </resources>

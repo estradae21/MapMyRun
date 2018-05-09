@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import com.ernestoestrada.mapmyrun.R
 
 /**
  * Created by neilk on 5/5/2018.
@@ -29,8 +29,7 @@ class WorkoutListFragment : Fragment()
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View?
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?
     {
 
         var view = inflater?.inflate(R.layout.fragment_workout_list, container, false)
@@ -53,7 +52,7 @@ class WorkoutListFragment : Fragment()
         updateUI()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?)
+    override fun onSaveInstanceState(outState: Bundle)
     {
         super.onSaveInstanceState(outState)
         outState!!.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible)
@@ -85,14 +84,14 @@ class WorkoutListFragment : Fragment()
                 var workout : Workout = Workout()
                 WorkoutLab.get(activity)!!.addWorkout(workout)
 
-                var intent : Intent = WorkoutPagerActivity().newIntent(activity, workout.getId()!!)
+                var intent : Intent = WorkoutPagerActivity().newIntent(activity!!, workout.getId()!!)
                 startActivity(intent)
                 return true
             }
 
             R.id.show_subtitle ->{
                 mSubtitleVisible = !mSubtitleVisible
-                activity.invalidateOptionsMenu()
+                activity!!.invalidateOptionsMenu()
                 updateSubtitle()
                 return true
             }
@@ -148,7 +147,7 @@ class WorkoutListFragment : Fragment()
                 //Toast.makeText(itemView.context, mWorkout.getTitle() + " clicked!", Toast.LENGTH_SHORT).show()
                 //var intent : Intent = Intent(activity, WorkoutActivity::class.java)
 
-                var intent = WorkoutPagerActivity().newIntent(activity, mWorkout.getId()!!)
+                var intent = WorkoutPagerActivity().newIntent(activity!!, mWorkout.getId()!!)
                 startActivity(intent)
             }
         }
@@ -171,6 +170,7 @@ class WorkoutListFragment : Fragment()
 
     inner class WorkoutAdapter(workouts: List<Workout>) : RecyclerView.Adapter<WorkoutHolder>()
     {
+
         private var mWorkouts : List<Workout> = workouts
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkoutHolder
@@ -184,7 +184,7 @@ class WorkoutListFragment : Fragment()
             return mWorkouts.size
         }
 
-        override fun onBindViewHolder(holder: WorkoutHolder?, position: Int)
+        override fun onBindViewHolder(holder: WorkoutHolder, position: Int)
         {
             var workout : Workout = mWorkouts.get(position)
             holder?.bind(workout)

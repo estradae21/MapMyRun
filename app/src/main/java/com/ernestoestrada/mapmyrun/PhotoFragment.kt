@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
+import com.ernestoestrada.mapmyrun.R
 import java.io.File
 import java.util.*
 
@@ -26,7 +27,7 @@ class PhotoFragment : DialogFragment()
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
-        var uuid : UUID = arguments.getSerializable(WORKOUT_ID) as UUID
+        var uuid : UUID = arguments?.getSerializable(WORKOUT_ID) as UUID
         var workout : Workout = WorkoutLab.get(activity)?.getWotkout(uuid)!!
         mWorkoutPhotoFile = WorkoutLab.get(activity)!!.getPhotoFile(workout)
     }
@@ -44,7 +45,7 @@ class PhotoFragment : DialogFragment()
             }
         })
 
-        return AlertDialog.Builder(activity).setView(view).create()
+        return AlertDialog.Builder(activity!!).setView(view).create()
     }
 
     private fun updatePhoto()
