@@ -1,6 +1,7 @@
 package com.ernestoestrada.mapmyrun
 
 import android.Manifest.*
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -63,9 +64,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //bindViews()
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
 
-        var actionBar = getSupportActionBar()
+        var actionBar = supportActionBar
         actionBar!!.setDisplayShowTitleEnabled(false)
-        actionBar!!.setDisplayShowTitleEnabled(true)
+        actionBar.setDisplayShowTitleEnabled(true)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -87,11 +88,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             else {
                 try {
                     // Request location updates
-                    locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener);
+                    locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0f, locationListener)
                     newLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                     oldLocation = locationManager?.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 } catch(ex: SecurityException) {
-                    Log.d("myTag", "Security Exception, no location available");
+                    Log.d("myTag", "Security Exception, no location available")
                 }
                 getGPS()
                 StartTime = SystemClock.uptimeMillis()
@@ -126,7 +127,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             MilliSeconds = 0
             addMarker(3)
             handler?.removeCallbacks(runnable)
-            tView.setText("00:00:00")
+            tView.text = "00:00:00"
             runfinished()
         }
     }
@@ -205,7 +206,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (true) {
             val isOkay = ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION)
             if (isOkay == PackageManager.PERMISSION_GRANTED) {
-                mMap?.isMyLocationEnabled = true
+                mMap.isMyLocationEnabled = true
                 getGPS()
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
 
@@ -238,19 +239,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             points.add(latLng!!)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
             redrawline()
-            getDistance(location)
+            newLocation = location
+            getDistance()
         }
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
         override fun onProviderEnabled(provider: String) {}
         override fun onProviderDisabled(provider: String) {}
     }
 
-    private fun getDistance(location: Location) {
-        newLocation = location
+    private fun getDistance() {
+        var distance : Float = 0F
+        distance = oldLocation!!.distanceTo(newLocation)
+        if (distance >= 20.0) {
+            toast("$distance")
+            distanceTraveled += distance
+            //mView.text =
+            oldLocation = newLocation
+        }
+        else {
+            toast("good")
+            Log.i("Distance", "Distance is to close to measure ")
+        }
+        /* newLocation = location
         distanceTraveled += oldLocation!!.distanceTo(newLocation)
-        distanceTraveled *= 0.000621371192
-        mView.text = "$distanceTraveled miles"
+        distanceTraveled *= 0.000621371192237334
+        toast("$distanceTraveled")
+        mView.text = "%.2f".format(distanceTraveled)
         oldLocation = location
+        */
     }
 
     private fun redrawline() {
@@ -269,10 +285,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun mapstyle () {
         val mapList = arrayListOf<String>("Normal", "Satelleite", "Terrain", "Hybrid")
         selector("Which map style?", mapList, {dialogInterface, i ->
-            if (i == 0) { mMap?.mapType = GoogleMap.MAP_TYPE_NORMAL }
-            else if (i == 1) { mMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE }
-            else if (i == 2) { mMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN }
-            else { mMap?.mapType = GoogleMap.MAP_TYPE_HYBRID }
+            if (i == 0) { mMap.mapType = GoogleMap.MAP_TYPE_NORMAL }
+            else if (i == 1) { mMap.mapType = GoogleMap.MAP_TYPE_SATELLITE }
+            else if (i == 2) { mMap.mapType = GoogleMap.MAP_TYPE_TERRAIN }
+            else { mMap.mapType = GoogleMap.MAP_TYPE_HYBRID }
         })
     }
 
@@ -293,6 +309,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             else -> super.onOptionsItemSelected(item)
         }
     }
+    
 }
 
 
