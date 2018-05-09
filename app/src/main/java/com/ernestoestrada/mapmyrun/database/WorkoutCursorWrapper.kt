@@ -2,8 +2,8 @@ package com.ernesto.neil.fitnessmapp.database
 
 import android.database.Cursor
 import android.database.CursorWrapper
-import com.ernesto.neil.fitnessmapp.Workout
 import com.ernesto.neil.fitnessmapp.database.WorkoutDbSchema.*
+import com.ernestoestrada.mapmyrun.Workout
 import java.util.*
 
 /**

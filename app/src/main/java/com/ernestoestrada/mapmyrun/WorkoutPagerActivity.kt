@@ -1,4 +1,4 @@
-package com.ernesto.neil.fitnessmapp
+package com.ernestoestrada.mapmyrun
 
 import android.content.Context
 import android.content.Intent

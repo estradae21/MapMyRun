@@ -1,17 +1,14 @@
-package com.ernesto.neil.fitnessmapp
+package com.ernestoestrada.mapmyrun
 
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import com.ernesto.neil.fitnessmapp.database.WorkoutBaseHelper
 import com.ernesto.neil.fitnessmapp.database.WorkoutCursorWrapper
-import com.ernesto.neil.fitnessmapp.database.WorkoutDbSchema
-import com.ernesto.neil.fitnessmapp.database.WorkoutDbSchema.*
+import com.ernesto.neil.fitnessmapp.database.WorkoutDbSchema.WorkoutTable
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * Created by neilk on 5/5/2018.
