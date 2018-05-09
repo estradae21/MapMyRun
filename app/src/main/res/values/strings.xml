@@ -4,4 +4,23 @@
     <string name="action_style">Style</string>
     <string name="action_info">Info</string>
     <string name="action_help">Help</string>
+    <string name="workout_title_hint">Enter a title for the workout</string>
+    <string name="workout_title_label">Title</string>
+    <string name="workout_detail_label">Details</string>
+    <string name="workout_completed_label">Workout Completed</string>
+    <string name="workout_duration">Duration: </string>
+    <string name="workout_distance">Distance: </string>
+    <string name="date_picker_title">Date of workout:</string>
+    <string name="new_workout">New Workout</string>
+    <string name="show_subtitle">Show Subtitle</string>
+    <string name="hide_subtitle">Hide Subtitle</string>
+    <string name="subtitle_format">%1$d workouts</string>
+    <string name="workout_client_text">Choose Client Name</string>
+    <string name="workout_report_text">Send Workout Report</string>
+    <string name="workout_report">%1$s! This workout occured on %2$s. %3$s, and %4$s</string>
+    <string name="workout_report_completed">The workout was completed</string>
+    <string name="workout_report_uncompleted">The workout was not completed</string>
+    <string name="workout_report_no_client">there is no client.</string>
+    <string name="workout_report_client">the client is %s.</string>
+    <string name="workout_report_subject">FitnessMapp Workout Report</string>
 </resources>

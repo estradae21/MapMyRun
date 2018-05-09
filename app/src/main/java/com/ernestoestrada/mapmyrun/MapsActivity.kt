@@ -253,7 +253,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getDistance() {
-        var distance : Float = 0F
+        var distance: Float
         distance = oldLocation!!.distanceTo(newLocation)
         if (distance >= 20.0) {
             distanceTraveled += distance
