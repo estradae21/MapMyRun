@@ -2,6 +2,10 @@ package com.ernestoestrada.mapmyrun
 
 import android.Manifest.*
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -17,6 +21,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -56,6 +61,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     internal var isPaused :Boolean = false
     internal var TotalTime = ""
     lateinit var line : Polyline
+    private lateinit var distanceText : TextView
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,8 +136,45 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             addMarker(3)
             handler?.removeCallbacks(runnable)
             tView.text = "00:00:00"
+
+            saveOrDiscardWorkout(this)
+
             runfinished()
         }
+    }
+
+    fun saveOrDiscardWorkout(context: Context)
+    {
+        var alertDialog = AlertDialog.Builder(this).create()
+        alertDialog.setTitle("Workout Stopped!")
+        alertDialog.setMessage("Save Workout? Press Ok to save or Cancel to discard")
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", object: DialogInterface.OnClickListener{
+            override fun onClick(p0: DialogInterface?, p1: Int)
+            {
+                alertDialog.dismiss()
+            }
+
+        })
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", object : DialogInterface.OnClickListener{
+            override fun onClick(p0: DialogInterface?, p1: Int)
+            {
+                var workout = Workout()
+                workout.setTime(TotalTime)
+                var miles : String = distanceText.text.toString()
+                var m = miles.toFloat()
+                workout.setDistance(m)
+
+                WorkoutLab.get(context)!!.addWorkout(workout)
+
+                var intent : Intent = WorkoutPagerActivity().newIntent(context, workout.getId()!!)
+                startActivity(intent)
+            }
+
+        })
+
+        alertDialog.show()
     }
 
     var runnable : Runnable = object : Runnable {
